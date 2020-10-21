@@ -1,0 +1,165 @@
+function checkCashRegister(price, cash, cid) {
+  let change = cash-price;
+  let answer = { status: null, change: []};
+  let drawer =[];
+  let drawerTotal = 0;
+  let money = [
+  ["ONE HUNDRED",  100],
+  ["TWENTY",  20],
+  ["TEN",  10],
+  ["FIVE",  5],
+  ["ONE",  1],
+  ["QUARTER",  0.25],
+  ["DIME",  0.1],
+  ["NICKEL",  0.05],
+  ["PENNY",  0.01]
+];
+
+//create drawer array so in the same order as the money array
+drawer = cid.reverse();
+for (let i=0; i<drawer.length; i++){
+  drawerTotal = drawerTotal + drawer[i][1];
+}
+
+// not enough money in drawer to give change
+if (change > drawerTotal){
+  answer.status = "INSUFFICIENT_FUNDS";
+  answer.change = [];
+  answer.change = answer.change.reverse();
+  return answer;
+}
+//give all the money in the till back as change
+else if (change === drawerTotal){
+  answer.status = "CLOSED";
+  answer.change = cid;
+  answer.change = answer.change.reverse();
+  return answer;
+}
+else{
+  let okToAdd = true;
+  answer.status = "OPEN";
+  while (change > 0){
+    //console.log("DRAWER:");
+    //console.log(drawer);
+    //console.log("CHANGE:");
+    //console.log(change);
+    money = [
+        ["ONE HUNDRED",  100],
+        ["TWENTY",  20],
+        ["TEN",  10],
+        ["FIVE",  5],
+        ["ONE",  1],
+        ["QUARTER",  0.25],
+        ["DIME",  0.1],
+        ["NICKEL",  0.05],
+        ["PENNY",  0.01]
+    ];
+    //finds the next coin or bill to take from the till
+    let denomToAdd = findNextDenom(change);
+    //console.log("Next Denom to add:" + denomToAdd);
+    
+    //need to check the till for available denomToAdd
+    denomToAdd = checkDrawer(denomToAdd);
+    //console.log("Next Denom to add after checks:" + denomToAdd);
+    if (denomToAdd === -1){
+      //console.log("check Drawer returned insufficient funds.");
+      answer.change.reverse();
+      return answer;
+    }
+    // if the array isnt empty you don't have to check for existing denom in change array. it is OK to add
+    if (answer.change.length > 0){
+      //console.log("array isnt empty. checking array for existing value");
+       okToAdd = checkArray(denomToAdd);
+    }
+    // if OK to add, then do it
+    if(okToAdd){
+      //console.log("Value didn't exist. Adding to array.")
+      answer.change.push(denomToAdd);
+      //console.log("ANSWER AFTER UPDATE: ");
+      //console.log(answer);
+    }
+    //console.log(denomToAdd);
+    //take the coin or bill away from the total you still owe the customer
+    change = change - denomToAdd[1];
+    change = Math.round(100*change)/100;
+
+  }
+  //answer.change = answer.change.reverse();
+  return answer;
+}
+
+//checks array if denom has already been added so it can add to total for denom
+function checkArray(denomination){
+  for (let i = 0; i<answer.change.length; i++){
+    
+    if(answer['change'][i][0].toString()===denomination[0].toString()){
+      //need to change existing array instead of adding to it
+      //console.log("Value existed. Updating current value");
+      answer['change'][i][1] += denomination[1];
+      //console.log("ANSWER SO FAR");
+      //console.log(answer);
+      return false;
+    }
+  } 
+  //console.log("value didnt' exist. OK TO ADD. 2 statements for this")
+  return true;
+}
+
+//finds the next coin or bill to take from the drawer - need to check drawer for sufficient funds
+function findNextDenom(amount){
+  //loop through money array to find denomination you need to take.
+  for (let i = 0; i<money.length; i++){
+    //console.log("Finding the correct bill for amount " + amount);
+    //console.log("money[" + i +"][1] ("+money[i][1]+") <=" + amount);
+    //console.log(money[i][1] <= amount);
+    if (money[i][1] <= amount){
+      //console.log("The bill we found was " + money[i]);
+      return money[i];
+    }
+  }
+}
+
+//returns -1 if drawer has no money for transaction
+function checkDrawer(denomination){
+  
+  //loop through drawer array to find the denomination you need to check for
+  for (let i = 0; i<drawer.length; i++){
+    
+    if (drawer[i][0].toString() === denomination[0].toString()){
+      //if the drawer has insufficient funds, check drawer for next smallest denom
+      //console.log("checking drawer for :" + denomination[0].toString());
+      
+      if (drawer[i][1] < denomination[1]){
+        //console.log("the til doesn't have sufficient funds for " + denomination[1]);
+        //if you are at the pennies, you have insufficient funds
+        if (i < 8){
+          //console.log("you are not yet at the Pennies. checking next denom");
+          return checkDrawer(money[i+1]);
+        }
+        else{
+          //console.log("You are at the pennies. No more funds to check. Returning -1");
+          answer.status = "INSUFFICIENT_FUNDS";
+          answer.change = [];
+          return -1;
+        }
+      }
+      //if the drawer has enough funds, return the denomination
+      else{
+        //remove from drawer
+        //console.log("the drawer had enough funds! updating drawer after removing money.")
+        drawer[i][1] = drawer[i][1]-denomination[1];
+       // console.log("returning: " + denomination);
+        return denomination;
+    }
+    }
+ 
+  }
+}
+    
+}
+
+
+
+checkCashRegister(3.26, 100, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]) //should return {status: "OPEN", change: [["TWENTY", 60], ["TEN", 20], ["FIVE", 15], ["ONE", 1], ["QUARTER", 0.5], ["DIME", 0.2], ["PENNY", 0.04]]}.
+
+checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
