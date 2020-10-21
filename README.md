@@ -1,2 +1,1 @@
-# DecimalToRomanNumeral
-For the FreeCodeCamp JavaScript programming challenge
+These are my solutions to the FreeCodeCamp JavaScript Algorithms and Data Structures coding challenges.
