@@ -1,0 +1,22 @@
+function palindrome(str) {
+  let newStr =str.replace(/[^A-Za-z0-9]/gi,"");
+  newStr = newStr.toLowerCase();
+  newStr = newStr.split("");
+
+  //check each pair of letters
+  let first = 0;
+  let last = newStr.length - 1;
+  while (first <= last){
+    if (newStr[first] != newStr[last]){
+      return false;
+    }
+    first++;
+    last--;
+  }
+  //if you've gotten this far its true
+  return true;
+}
+
+
+
+palindrome("eye");
