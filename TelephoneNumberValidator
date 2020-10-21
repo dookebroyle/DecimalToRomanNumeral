@@ -1,0 +1,14 @@
+function telephoneCheck(str) {
+  // see if there are more than 11 digits
+  let newStr =str.replace(/[^0-9]/g, '');
+  if (newStr.length >= 11 && newStr.charAt(0) != 1){
+    return false;
+  }
+
+  //if there are 11 digits or less
+  let regex = 
+/^(1(\s)?)?((\d{3})|(\(\d{3}\)))(-|\s)?(\d{3})(-|\s)?(\d{4})/g;
+  return regex.test(str);
+}
+
+telephoneCheck("555-555-5555");
