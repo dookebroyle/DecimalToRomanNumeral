@@ -1,0 +1,30 @@
+unction rot13(str) {
+  //work with each character individually
+  let newStr = str.split("");
+  //only want to replace the letters, need regEx to match
+  let regex = /[A-Za-z]/
+  
+  //convert all letters to their ASCI code
+  newStr = newStr.map(x => {  return toASCII(x)});
+ 
+
+
+  function toASCII(letter){
+    //if the letter is in fact a letter, replace with ASCII code
+    if (regex.test(letter)){
+      letter = letter.charCodeAt();
+      //if shifting letter forward is outside of alphabet, shift backwards instead
+      return (letter < 78 ? String.fromCharCode(letter + 13) : 
+                                                String.fromCharCode(letter - 13)) ;
+    }
+    //if its not a letter, leave it alone!
+    else{
+      return letter;
+    }
+  }
+
+
+  return newStr.join("");
+}
+
+rot13("SERR PBQR PNZC");ZC");
